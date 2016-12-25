@@ -18,17 +18,28 @@ UOpenDoor::UOpenDoor()
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
+
 	Super::BeginPlay();
+
+	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
+}
+
+void UOpenDoor::OpenDoor() {
 	AActor *Owner = GetOwner();
 	FString ObjectName = Owner->GetName();
 
-	FRotator NewRotation = FRotator(0.0f,30.0f,0.0f);
+	FRotator NewRotation = FRotator(0.0f, OpenAngle, 0.0f);
 
 	Owner->SetActorRotation(NewRotation);
-	
+}
 
-	//UE_LOG(LogTemp, Warning, TEXT("%s object has rotation of %s"), *ObjectName, *roat);
-	
+void UOpenDoor::CloseDoor() {
+	AActor *Owner = GetOwner();
+	FString ObjectName = Owner->GetName();
+
+	FRotator NewRotation = FRotator(0.0f, 0.0f, 0.0f);
+
+	Owner->SetActorRotation(NewRotation);
 }
 
 
@@ -37,6 +48,13 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	// ...
+	// poll trigger volume 
+	if (PressurePlate->IsOverlappingActor(ActorThatOpens)) {
+		//if the actorthatopens is in the triggervolume 
+		OpenDoor();
+	}
+	else {
+		CloseDoor();
+	}
 }
 
